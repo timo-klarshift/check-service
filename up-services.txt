@@ -1,0 +1,3 @@
+apps.klarshift.de:8080
+klarshift.de:80
+klarshift.de:25
