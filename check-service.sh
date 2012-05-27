@@ -57,7 +57,8 @@ checkServer(){
 	
 	echo -ne "$port\t"
 	
-	if [ "$(nmap -P0 -p$port $ip | grep open)" ]
+	no=`nmap -PN -p$port $ip`; 
+	if [ "$(echo $no | grep open)" -o  "$(echo $no | grep filtered)" ]
 	then
 		echo -e "${cGreen}UP"		
 		echo "$ip:$port" >> "up-services.txt"
