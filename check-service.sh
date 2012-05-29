@@ -24,15 +24,13 @@ init(){
 }
 
 summary(){
-	echo ""
-	
+	echo ""	
 	if [ $down -eq 0 ]; then
 		echo -e "${cGreen}Everything OK :: 100% UP"
 	else
 		echo -e "${cRed}WARNING - Not all Services online\n${cReset}[DOWN/TOTAL] Ratio ::  ${cRed}$down/$total"
 	fi
 	echo -e "${cReset}"
-	
 }
 
 # tab helper
@@ -57,16 +55,33 @@ checkServer(){
 	
 	echo -ne "$port\t"
 	
-	no=`nmap -PN -p$port $ip`; 
-	if [ "$(echo $no | grep open)" -o  "$(echo $no | grep filtered)" ]
+	# using wget for http url avoiding 
+	# `online` hosts due filtered ip-tables
+	if [ $port -eq 80 -o $port -eq 8080 ]
 	then
-		echo -e "${cGreen}UP"		
-		echo "$ip:$port" >> "up-services.txt"
-	else
-		echo -e "${cRed}DOWN"		
-		echo "$ip:$port" >> "down-services.txt"
-		down=$((down+1))
-	fi		
+		no=`wget -t 1 -T 5 $ip:$port 2>&1`; 
+		if [ "$(echo $no | grep failed)"  ]
+		then
+			echo -e "${cRed}DOWN"		
+			echo "$ip:$port" >> "down-services.txt"
+			down=$((down+1))
+		else
+			echo -e "${cGreen}UP"		
+			echo "$ip:$port" >> "up-services.txt"
+		fi		
+	else	
+		# use nmap for all other services
+		no=`nmap -PN -P0 -p$port $ip`; 
+		if [ "$(echo $no | grep open)"  ]
+		then
+			echo -e "${cGreen}UP"		
+			echo "$ip:$port" >> "up-services.txt"
+		else
+			echo -e "${cRed}DOWN"		
+			echo "$ip:$port" >> "down-services.txt"
+			down=$((down+1))
+		fi		
+	fi
 	echo -ne "${cReset}"	# reset color
 }
 

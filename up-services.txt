@@ -1,4 +1,5 @@
-apps.klarshift.de:8080
 klarshift.de:80
-klarshift.de:25
+apps.klarshift.de:8080
 212.91.227.76:80
+212.91.227.78:80
+212.91.227.77:80
